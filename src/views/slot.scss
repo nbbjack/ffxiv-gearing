@@ -1,4 +1,4 @@
-@use "./mixins" as *;
+@use "./components/mixins" as *;
 
 .gears_slot {
   margin-top: 10px;
@@ -35,6 +35,30 @@
   .app-view & {
     max-width: 198px;
   }
+  .gears_color-red & {
+    color: #721c24;
+    .app-high-saturation & {
+      color: #9c0010;
+    }
+  }
+  .gears_color-green & {
+    color: #155724;
+    .app-high-saturation & {
+      color: #007a2b;
+    }
+  }
+  .gears_color-blue & {
+    color: #003085;
+    .app-high-saturation & {
+      color: #003899;
+    }
+  }
+  .gears_color-purple & {
+    color: #36037c;
+    .app-high-saturation & {
+      color: #3e0094;
+    }
+  }
 }
 .gears_hq {
   width: 12px;
@@ -61,10 +85,18 @@
   fill: rgba(0, 0, 0, .77);
 }
 
+.gears_toogle-all-foods {
+  float: right;
+  height: 29px;
+  margin-top: 4px;
+  margin-right: -11px;
+  font-size: 12px;
+}
+
 .gears_materias {
   position: relative;
   z-index: 0;
-  width: 247px;
+  width: 277px;
   padding-left: 13px;
   padding-right: 13px;
   border-left: $table-border;
@@ -78,8 +110,12 @@
 }
 
 .gears_stat {
-  text-align: center;
   width: 60px;
+  text-align: center;
+  &.-skeleton {
+    width: 86px;
+    white-space: nowrap;
+  }
   .gears_item.-food & {
     line-height: 1;
   }
@@ -88,27 +124,32 @@
   &.-full {
     font-weight: bold;
   }
+  &.-skeleton {
+    display: inline-block;
+    width: 50%;
+    font-weight: bold;
+    text-align: right;
+    &:last-child {
+      margin-right: 50%;
+    }
+  }
 }
-.gears_stat-required {
+.gears_stat-caps {
+  display: inline-block;
+  width: 50%;
+  padding-left: 1px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1;
+  color: #00000099;
+}
+.gears_stat-requirement {
   display: block;
   margin-bottom: -2px;
   font-size: 12px;
   line-height: 8px;
   color: rgba(0, 0, 0, .54);
   transform: scale(.9);
-}
-.gears_stat-materia {
-  position: relative;
-  top: -8px;
-  left: -1px;
-  //display: inline-block;
-  display: none;
-  width: 0;
-  font-size: 12px;
-  white-space: nowrap;
-  vertical-align: top;
-  transform: scale(0.9);
-  transform-origin: left;
 }
 .gears_empty {
   color: #00000060;

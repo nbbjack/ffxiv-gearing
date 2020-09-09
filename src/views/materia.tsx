@@ -3,10 +3,10 @@ import { observer } from 'mobx-react-lite';
 import * as classNames from 'classnames';
 import * as G from '../game';
 import { IMateria } from "../stores";
-import { useStore } from './context';
-import { Dropdown } from './dropdown';
+import { useStore } from './components/contexts';
+import { Dropdown } from './components/Dropdown';
 
-const Materia = observer<{ materia: IMateria }>(({ materia }) => {
+export const Materia = observer<{ materia: IMateria }>(({ materia }) => {
   const store = useStore();
   return (
     <Dropdown
@@ -19,6 +19,12 @@ const Materia = observer<{ materia: IMateria }>(({ materia }) => {
             expanded && '-active'
           )}
           onClick={store.isViewing ? undefined : toggle}
+          onContextMenu={store.isViewing ? undefined : e => {
+            if (!document.getSelection()?.toString()) {
+              e.preventDefault();
+              materia.meld(undefined);
+            }
+          }}
           children={materia.name}
         />
       )}
@@ -26,7 +32,7 @@ const Materia = observer<{ materia: IMateria }>(({ materia }) => {
         <MateriaPanel materia={materia} labelElement={labelElement} />
       )}
       placement="bottom-start"
-      modifiers={React.useMemo(() => ([{ name: 'offset', options: { offset: [-104 - materia.index * 44, 0] } }]), [])}
+      modifiers={React.useMemo(() => ([{ name: 'offset', options: { offset: [-104 - materia.index * 50, 0] } }]), [])}
     />
   );
 });
@@ -58,11 +64,16 @@ const MateriaPanel = observer<{ materia: IMateria, labelElement: HTMLElement | n
                 materia.stat === stat && materia.grade === grade && '-selected'
               )}
               onClick={() => {
-                materia.meld(stat, grade);
-                const nextMateria = labelElement?.nextElementSibling;
-                if (nextMateria?.childNodes.length === 0) {
-                  (nextMateria as HTMLElement).click();
+                if (materia.stat === undefined) {  // Only for initial melding, not for changing materia
+                  const nextMateria = labelElement?.nextElementSibling;
+                  if (nextMateria === null) {
+                    labelElement?.click();
+                  }
+                  if (nextMateria?.childNodes.length === 0) {
+                    (nextMateria as HTMLElement).click();
+                  }
                 }
+                materia.meld(stat, grade);
               }}
               children={'+' + G.materias[stat]![grade - 1]}
             />
@@ -83,5 +94,3 @@ const MateriaPanel = observer<{ materia: IMateria, labelElement: HTMLElement | n
     </table>
   );
 });
-
-export { Materia };

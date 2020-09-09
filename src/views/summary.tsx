@@ -1,12 +1,15 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
+import * as classNames from 'classnames';
 import { Ripple } from '@rmwc/ripple';
 import { Button } from '@rmwc/button';
+import { Tooltip } from '@rmwc/tooltip';
 import * as G from '../game';
-import { useStore } from './context';
-import { Dropdown } from './dropdown';
+import { useStore } from './components/contexts';
+import { Icon } from './components/Icon';
+import { Dropdown } from './components/Dropdown';
 
-const Summary = observer(() => {
+export const Summary = observer(() => {
   const store = useStore();
   const effects = store.equippedEffects;
   const [ tiersVisible, setTiersVisible ] = React.useState(false);
@@ -69,14 +72,22 @@ const Summary = observer(() => {
         {effects && (
           <span className="summary_stat summary_damage">
             {effects.damage.toFixed(5)}
+            <Tooltip
+              content="包括食物和组队加成，不包括其他任何手动施放的增益（如爆发药、连环计、天语、以太复制等）"
+              showArrow
+            >
+              <span className="summary_damage-tip">
+                <Icon name="help" />
+              </span>
+            </Tooltip>
             <div className="summary_stat-name">每威力伤害期望</div>
           </span>
         )}
       </span>
       <span className="summary_divider" />
       {store.schema.stats.map(stat => (
-        <span key={stat} className="summary_stat">
-          {tiersVisible && store.equippedTiers[stat] !== undefined && (
+        <span key={stat} className={classNames('summary_stat', store.schema.skeletonGears && '-skeleton')}>
+          {tiersVisible && store.equippedTiers !== undefined && store.equippedTiers[stat] !== undefined && (
             <div className="summary_stat-tier">
               <span className="summary_stat-prev">{store.equippedTiers[stat]!.prev}</span>
               <span className="summary_stat-next">+{store.equippedTiers[stat]!.next}</span>
@@ -86,9 +97,15 @@ const Summary = observer(() => {
           {effects && (
             <React.Fragment>
               {(stat === 'SKS' || stat === 'SPS') && (
-                <div className="summary_stat-effect">
-                  {effects.gcd.toFixed(2)}s
-                </div>
+                <Tooltip
+                  content={store.schema.statModifiers?.gcdReason ?? ''}
+                  showArrow
+                  open={store.schema.statModifiers?.gcdReason === undefined ? false : undefined}
+                >
+                  <div className={classNames('summary_stat-effect', store.schema.statModifiers?.gcdReason && '-tip')}>
+                    {effects.gcd.toFixed(2) + 's'}
+                  </div>
+                </Tooltip>
               )}
               {stat === 'VIT' && (
                 <div className="summary_stat-effect summary_stat-effect-hp">
@@ -113,5 +130,3 @@ const Summary = observer(() => {
     </div>
   );
 });
-
-export { Summary };

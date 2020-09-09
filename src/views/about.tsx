@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { observer } from 'mobx-react-lite';
 
-const About = observer(() => {
+export const About = observer(() => {
   return (
     <div className="about">
       <span className="about_name">最终幻想14配装器</span>
-      <span className="about_version">2007g</span>
+      <span className="about_version">2008k</span>
       <span className="about_separator">·</span>
       <a
         className="about_link"
@@ -23,5 +23,3 @@ const About = observer(() => {
     </div>
   );
 });
-
-export { About };

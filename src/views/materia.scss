@@ -1,13 +1,22 @@
-@use "./mixins" as *;
+@use "./components/mixins" as *;
 
 .gears_materia {
   position: relative;
   display: inline-block;
-  width: 48px;
+  width: 54px;
   margin: auto -2px;
   line-height: 26px;
   text-align: center;
   border-radius: 2px;
+  &:not(:empty):after {
+    content: " ";
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    bottom: 4px;
+    border-bottom: 2px solid;
+    opacity: 0.1;
+  }
   .app-edit & {
     &:hover {
       z-index: 1;
@@ -31,6 +40,9 @@
   &.-normal {
     color: #155724;
     //color: mix($green, #000, 60%);
+    .app-high-saturation & {
+      color: #007a2b;
+    }
     &:empty:before {
       border-color: transparentify(#c3e6cb);
     }
@@ -38,6 +50,9 @@
   &.-advanced {
     color: #721c24;
     //color: mix($red, #000, 63%);
+    .app-high-saturation & {
+      color: #9c0010;
+    }
     &:empty:before {
       border-color: transparentify(#f5c6cb);
     }
@@ -77,6 +92,9 @@
   }
   &.-selected {
     background-color: rgba($primary, .08);
+    .app-high-saturation & {
+      background-color: rgba($primary, .16);
+    }
   }
 }
 td.materias_meldable {

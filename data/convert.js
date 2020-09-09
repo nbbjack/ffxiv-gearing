@@ -20,6 +20,11 @@ function loadExd(filename) {
   });
 }
 
+const versions = {
+  data: '5.3',
+  released: '5.21',  // released version of chinese datacenter
+};
+
 const statAbbrs = {
   1: 'STR', 2: 'DEX', 4: 'INT', 5: 'MND', 3: 'VIT',
   27: 'CRT', 22: 'DHT', 44: 'DET', 45: 'SKS', 46: 'SPS', 19: 'TEN', 6: 'PIE',
@@ -42,6 +47,7 @@ const patches = {
   58: '5.0', 59: '5.01', 60: '5.05', 61: '5.08',
   62: '5.1', 63: '5.11', 65: '5.15',
   66: '5.2', 67: '5.21', 68: '5.25',
+  69: '5.3',
 };
 
 const sources = require('./in/sources');
@@ -125,9 +131,10 @@ const gears = Item
       }
       const craft = 'CMS' in stats || 'CRL' in stats || 'CP' in stats;
       const gather = 'GTH' in stats || 'PCP' in stats || 'GP' in stats;
-      if (craft) jobCategory = 33;
-      if (gather) jobCategory = 32;
+      if (craft && !gather) jobCategory = 33;
+      if (!craft && gather) jobCategory = 32;
       if (craft && gather) jobCategory = 35;
+      if (!craft && !gather) jobCategory = 34;
     }
     const equipLevel = Number(x['Level{Equip}']);
     if (jobCategory === 63 && equipLevel > 60) {  // 青魔并不能装备高等级装备
@@ -142,6 +149,7 @@ const gears = Item
       id: Number(x['#']),
       name: ItemCn[index] && ItemCn[index]['Name'] || x['Name'],
       level: Number(x['Level{Item}']),
+      rarity: Number(x['Rarity']),
       slot: Number(x['EquipSlotCategory']),
       role: Number(x['BaseParamModifier']),
       jobCategory,
@@ -219,6 +227,19 @@ const foods = Item
   })
   .filter(Boolean);
 
+const bestFoods = [];
+for (const food of foods.slice().reverse()) {
+  if (food.id === 4745) continue;  // 唯一的直击信仰食物，各只加1，应该并不会有人想吃它
+  if (food.patch > versions.released) {
+    food.best = true;
+    continue;
+  }
+  if (!bestFoods.some(bestFood => Object.keys(food.stats).every(stat => food.stats[stat] <= bestFood.stats[stat]))) {
+    food.best = true;
+    bestFoods.push(food);
+  }
+}
+
 const levelCaps = {
   level: Object.keys(levelsUsed).map(x => parseInt(x)).sort((a, b) => a - b),
 };
@@ -281,6 +302,7 @@ if (sourcesMissingIds.length > 0) {
   fs.unlink('./out/sourcesMissing.txt', () => {});  // ignore error
 }
 
+fs.writeFileSync('./out/versions.ts', stringify(versions).replace(/null,/g, ','));
 fs.writeFileSync('./out/gearGroupBasis.js', stringify(levelGroupBasis).replace(/null,/g, ','));
 fs.writeFileSync('./out/gearGroups.js', stringify(gearGroups).replace(/null,/g, ','));
 for (const groupId of levelGroupBasis) {
